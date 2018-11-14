@@ -1,0 +1,171 @@
+
+.main_border {
+    text-align: center;
+    margin: auto;
+    padding: 10px;
+}
+
+#title {
+    margin-top: 10px;
+}
+
+
+label { 
+    text-align: left;
+    white-space: nowrap;
+}
+
+
+.red_star {
+    color: red;
+}
+
+.stay_left {
+    text-align: left;
+    white-space: nowrap;
+}
+
+.result_panel {
+    margin: auto;
+    width: 75%;
+}
+.result_panel td{
+    vertical-align: middle;
+    
+}
+
+.keep_right {
+    margin-left: auto;
+}
+
+.keep_left {
+    text-align: left;
+}
+
+.button_border {
+    border-width: 1px;
+    border-style: solid;
+    border-color: silver;
+}
+
+.icon {
+    width: 44px;
+    height: 38px;
+}
+
+.no_padding {
+    padding: 0px;
+}
+
+::ng-deep .tab:first-child {
+    margin-left: auto;
+}
+
+round-progress {
+    margin: auto;
+    margin-left: 0;
+}
+
+.progress-wrapper {
+    margin: auto;
+    font-size: 20px;
+  }
+  
+.current {
+    position: absolute;
+    color: #bbb;
+    font-weight: 100;
+    line-height: 1;
+}
+
+.photo_border {
+    padding: 2px;
+}
+
+.photo_margin {
+    margin: 5px;
+}
+
+.no_padding {
+    padding: 0px;
+}
+
+@media (min-width: 576px) {
+    .card-columns {
+        column-count: 3;
+        display: none;
+    }
+}
+
+
+@media (max-width: 576px) {
+    #photo-display-sm {
+        display: none;
+    }
+}
+
+
+#mapsTab {
+    height: 400px;
+    width: 100%;
+}
+
+.searmap-img {
+    height: 300px;
+    width: 80%;
+}
+
+.venue_table {
+    text-align: left;
+    border-radius: 10px;
+    border-collapse: separate; 
+    border:1px solid #DFDFDF;
+}
+
+.venue_table tr {
+    border:0px ;
+    border-radius: 20px;
+}
+
+.venue_table td {
+    vertical-align: top;
+    border: 0px;
+}
+
+
+.gray_text{
+    color: gray;
+}
+.red_text{
+    color: red;
+}
+
+.yellow_star {
+    color: gold;
+}
+
+
+.ng-valid[required], .ng-valid.required  {
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    border-left: 10px solid rgb(218, 200, 43); /* yellow */
+}
+
+.ng-invalid:not(form)  {
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    border-left: 10px solid #e94646; /* red */
+}
+
+
+
+.backdrop{ 
+    background-color:rgba(0,0,0,0.6);
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100vh;
+}

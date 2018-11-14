@@ -1,0 +1,497 @@
+
+
+<div class="main_border">
+  <div class="card bg-light text-dark col-12 col-sm-8 main_border">
+    <p id="title"><b> Entertainment Event Ticket Search </b></p>
+
+    <form class="search_panel" #searchForm="ngForm">
+
+      <div class="form-group row">
+        <span class="col-0 col-sm-1"></span>
+        <label for="keyword" class="col-sm-3 col-form-label">Keyword<span class="red_star">*</span></label>
+        <div class="col-sm-6" floatLabel="never">
+
+          <input #keyword type="text" class="form-control" placeholder="Enter Artist, Team or Event Name (eg. Lakers)" 
+                name="keyword" matInput [formControl]="searchTerm" [matAutocomplete]="auto" (focusout)="checkSearchTerm()">
+          <div class="invalid-feedback stay_left">Please enter a keyword</div>
+
+          <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let item of searchResult" [value]="item.name">
+                {{ item.name }}
+              </mat-option>
+          </mat-autocomplete>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <span class="col-0 col-sm-1"></span>
+        <label for="category" class="col-sm-3 col-form-label">Category</label>
+        <div class="col-sm-2">
+          <select class="custom-select" name="category" [(ngModel)]="category">
+            <option value="all"> All </option>
+            <option value="music"> Music </option>
+            <option value="sports"> Sports </option>
+            <option value="arttheatre"> Art & Theatre </option>
+            <option value="film"> Film </option>
+            <option value="miscellanenous"> Miscellanenous </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <span class="col-0 col-sm-1"></span>
+        <label for="distance" class="col-sm-3 col-form-label">Distance</label>
+        <div class="col-sm-2">
+          <input type="text" class="form-control" id="distance" placeholder="10" name="distance" [(ngModel)]="distance">
+        </div>
+
+        <div class="col-sm-2">
+            <select class="custom-select" name="lengthUnits" [(ngModel)]="lengthUnits">
+              <option value="miles"> Miles </option>
+              <option value="kilometers"> Kilometers </option>
+            </select>
+        </div>
+
+      </div>
+
+      <fieldset class="form-group">
+        <div class="row">
+          <span class="col-0 col-sm-1"></span>
+          <label for="from" class="col-sm-3 col-form-label">From<span class="red_star">*</span></label>
+          <div class="col-sm-6">
+            <div class="form-check stay_left">
+              <input class="form-check-input" type="radio" id="current_radio" name="from" value="current" (click)="disableLocation()" [(ngModel)]="from"/>
+              <label class="form-check-label" for="current_radio">Current Location</label>
+            </div>
+            <div class="form-check stay_left">
+              <input class="form-check-input" type="radio" id="other_radio" name="from" value="other" (click)="enableLocation()" [(ngModel)]="from"/>
+              <div class="form-group">
+                <label class="form-check-label" for="other_radio">Other. Please specify:</label>
+                <input #location type="text" class="form-control" id="from" placeholder="Enter a Location" (keyup)="onLocation(location.value)" (blur)="blurLocation(location.value)" [disabled]="!locationStatus" name="location" [(ngModel)]="locationValue">
+                <div class="invalid-feedback stay_left">
+                    Please enter a location.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-group row">
+        <span class="col-0 col-sm-1"></span>
+        <div class="col-sm-3 stay_left">
+          <button type="button" class="btn btn-primary button_border" (click)="requestPlaces(searchForm)" [disabled]="!searchButtonStatus"><i class="fas fa-search"></i> Search</button>
+          <button type="button" class="btn button_border" (click)="onClear(searchForm)"><i class="fas fa-align-justify"></i> Clear</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+  <br>
+  <div>
+      <button *ngIf="!favoriteTable" type="button" class="btn btn-primary button_border" (click)="onResults()">Results</button>
+      <button *ngIf="!favoriteTable" type="button" class="btn btn-link no_text_decoration" (click)="onFavorites()">Favorites</button>
+      <button *ngIf="favoriteTable" type="button" class="btn btn-link no_text_decoration" (click)="onResults()">Results</button>
+      <button *ngIf="favoriteTable" type="button" class="btn btn-primary button_border" (click)="onFavorites()">Favorites</button>
+  </div>
+</div>
+
+
+<div class="result_panel" *ngIf="progrossBar">
+    <br> <br> <br>
+    <progressbar [value]="50" [striped]="true" [animate]="true"></progressbar>
+    <br> <br> <br>
+</div>
+
+
+<div [@rightIn]="placesIn" class="main_border" *ngIf="resultTable && !noRecords && !failedSearch && !detailsTab">
+    <div class="result_panel row">
+      <button type="button" class="btn btn-default button_border keep_right mb-1" (click)="onDetails(eventIdDisplay)" [disabled]="eventIdDisplay == ''">Details <i class="fas fa-chevron-right"></i> </button>
+    </div>
+    <table class="table table-hover table-responsive-sm result_panel">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Event</th>
+            <th>Catergory</th>
+            <th>Vanue Info</th>
+            <th>Favorite</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let x of eventsDisplay; let i = index" [class.table-warning]="eventIdDisplay == x.event_id">
+            <td>{{i+1}}</td>
+            <td>{{x.date}}</td>
+            <td><a href='' mat-raised-button matTooltip={{x.event}} (click)="onDetails(x.event_id)">{{x.event.substring(0, 25)}}...</a></td>
+            <td>{{x.category}}</td>
+            <td>{{x.venueInfo}}</td>
+            <td>
+                <button class='btn btn-default button_border' (click)="onFavoriteStar(x.event_id, x)" *ngIf="!checkExists(x.event_id)"><i class="far fa-star"></i></button>
+                <button class='btn btn-default button_border' (click)="deleteFavoriteStar(x.event_id)" *ngIf="checkExists(x.event_id)"><i class="fas fa-star yellow_star"></i></button>
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+</div>
+
+
+
+
+
+<div [@rightIn]="placesIn" class="main_border" *ngIf="favoriteTable && !noRecords && !detailsTab">
+    <div class="result_panel row">
+      <button type="button" class="btn btn-default button_border keep_right mb-1" (click)="onDetails(eventIdDisplay)" [disabled]="eventIdDisplay == ''">Details <i class="fas fa-chevron-right"></i> </button>
+    </div>
+    <table class="table table-hover table-responsive-sm result_panel">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Event</th>
+            <th>Catergory</th>
+            <th>Vanue Info</th>
+            <th>Favorite</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let x of favoritesDisplay" [class.table-warning]="eventIdDisplay == x.event_id">
+            <td>{{x.index}}</td>
+            <td>{{x.date}}</td>
+            <td><a href='' mat-raised-button matTooltip={{x.event}} (click)="onDetails(x.event_id)">{{x.event.substring(0, 25)}}...</a></td>
+            <td>{{x.category}}</td>
+            <td>{{x.venueInfo}}</td>
+            <td>
+                <button class='btn btn-default button_border' (click)="deleteFavoriteStar(x.event_id)" *ngIf="checkExists(x.event_id)"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+</div>
+
+
+
+
+<div [@leftIn]="detailsIn" class="main_border result_panel" *ngIf="detailsTab">
+    <h5> {{detailsObjectName}}</h5>
+    <br>
+    <div class="main_border row stay_left">
+        <button class="btn btn-default button_border" (click)="onBack2List()"><i class="fas fa-chevron-left"></i> List</button>
+        <div class="keep_right">
+            <button type="button" class='btn btn-default no_padding' [disabled]="eventIdDisplay == ''">
+                <a target='_blank' href={{twitterUrl}} [style.pointer-events]="eventIdDisplay == '' ? 'none' : 'auto'"><img class='icon' src='/assets/Twitter.png' /></a>
+              </button>
+            <button class='btn btn-default button_border' (click)="onFavoriteStar(detailsObjectEventId, detailsEventIdObject)" *ngIf="!checkExists(detailsObjectEventId)" [disabled]="eventIdDisplay == ''"><i class="far fa-star"></i></button>
+            <button class='btn btn-default button_border' (click)="deleteFavoriteStar(detailsObjectEventId)" *ngIf="checkExists(detailsObjectEventId)" [disabled]="eventIdDisplay == ''"><i class="fas fa-star yellow_star"></i></button>
+            
+        </div>
+    </div>
+
+    <tabset >
+      <tab heading="Event" customClass="tab" (select)="onEventInfo()">
+        <br>
+        <table class="table table-striped table-responsive-sm keep_left">
+          <tr *ngIf="event_artistteamsname!=''">
+            <th> Artist/Teams </th>
+            <td> {{event_artistteamsname}} </td>
+          </tr>
+
+          <tr *ngIf="event_venuesname!=''">
+            <th> Venue </th>
+            <td> {{event_venuesname}} </td>
+          </tr>
+
+          <tr *ngIf="event_date_localDate!='' || event_date_localTime!=''">
+            <th> Time </th>
+            <td> {{event_date_localDate | date}} {{event_date_localTime}} </td>
+          </tr>
+
+          <tr *ngIf="event_category!=''">
+            <th> Category </th>
+            <td> {{event_category}} </td>
+          </tr>
+
+          <tr *ngIf="event_prices!=''">
+            <th> Price Range </th>
+            <td> {{event_prices}} </td>
+          </tr>
+
+          <tr *ngIf="event_status!=''">
+            <th> Ticket Status </th>
+            <td> {{event_status}} </td>
+          </tr>
+
+          <tr *ngIf="event_url!=''">
+            <th> Buy Ticket At </th>
+            <td> 
+              <a target='_blank' href={{event_url}}> Ticketmaster </a> 
+            </td>
+          </tr>
+
+          <tr *ngIf="event_seatmap!=''">
+            <th> Seat Map </th>
+            <td> 
+              <a href="" (click)="openModalDialog()" > View Seat Map Here </a> 
+            </td>
+
+
+            
+
+          </tr>
+        
+        </table>
+
+
+
+      </tab>
+  
+      <tab heading="Artitst/Team" customClass="tab" (select)="onArtiestTeamInfo()">
+        
+        <div *ngIf="(artistMetaInfo | json) != '{}'">
+          <div *ngFor="let meta of objectKeys(artistMetaInfo)">
+            <br>
+            <span>{{meta}}</span>
+            <div *ngIf="artistFlag && (artistMetaInfo[meta] | json) != '{}'">
+              <table class="table table-striped table-responsive-sm keep_left">
+                <tr>
+                  <th> Name </th>
+                  <td>{{meta}}  </td>
+                </tr>
+      
+                <tr>
+                  <th> Followers </th>
+                  <td> {{artistMetaInfo[meta].followers | number: '2.'}}  </td>
+                </tr>
+    
+                <tr>
+                  <th> Popularity </th>
+                  <td> 
+                    <div class="progress-wrapper">
+                        <div class="current" [ngStyle]="getOverlayStyle()">{{artistMetaInfo[meta].popularity}}</div>
+                        <round-progress
+                          [current]="artistMetaInfo[meta].popularity"
+                          [max]="100"
+                          [stroke]="stroke"
+                          [radius]="radius"
+                          [semicircle]="semicircle"
+                          [rounded]="rounded"
+                          [responsive]="responsive"
+                          [clockwise]="clockwise"
+                          [color]="gradient ? 'url(#gradient)' : color"
+                          [background]="background"
+                          [duration]="duration"
+                          [animation]="animation"
+                          [animationDelay]="animationDelay"></round-progress>
+                      </div>
+                  </td>
+                </tr>
+    
+                <tr>
+                  <th> Check At </th>
+                  <td> 
+                      <a target='_blank' href={{artistMetaInfo[meta].url}}> Spotify </a> 
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+
+            <div class="row" id="photo-display-sm">
+              <div class="col-sm-4 no_padding">
+                <div class="card photo_margin" *ngFor="let x of photosMetaInfo[meta]['0']">
+                  <div class="card-body photo_border">
+                    <a target='_blank' href={{x}}>
+                      <img class="card-img" src={{x}}>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-4 no_padding">
+                <div class="card photo_margin" *ngFor="let x of photosMetaInfo[meta]['1']">
+                  <div class="card-body photo_border">
+                    <a target='_blank' href={{x}}>
+                      <img class="card-img" src={{x}}>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-4 no_padding">
+                <div class="card photo_margin" *ngFor="let x of photosMetaInfo[meta]['2']">
+                  <div class="card-body photo_border">
+                    <a target='_blank' href={{x}}>
+                      <img class="card-img" src={{x}}>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+
+          </div>
+        </div>
+
+        <div *ngIf="(artistMetaInfo | json) == '{}'">
+            <br> <br> <br>
+            <div class="alert alert-warning result_panel">
+              No records.
+            </div>
+        </div>
+      
+      </tab>
+      <tab heading="Venue" customClass="tab" (select)="onSelectMap()">
+        <div>
+          <br>
+          <span *ngIf="venue_event_name!=''">{{venue_event_name}}</span>
+          <table class="table table-striped table-responsive-sm keep_left">
+            <tr *ngIf="venue_event_address!=''">
+              <th> Address </th>
+              <td> {{venue_event_address}} </td>
+            </tr>
+            <tr *ngIf="venue_event_location!=''">
+              <th> City </th>
+              <td> {{venue_event_location}} </td>
+            </tr>
+            <tr *ngIf="venue_event_phoneNumber!=''">
+              <th> Phone Number </th>
+              <td> {{venue_event_phoneNumber}} </td>
+            </tr>
+            <tr *ngIf="venue_event_openHours!=''">
+              <th> Open Hours </th>
+              <td> {{venue_event_openHours}} </td>
+            </tr>
+            <tr *ngIf="venue_event_generalRule!=''">
+              <th> General Rule </th>
+              <td> {{venue_event_generalRule}} </td>
+            </tr>
+            <tr *ngIf="venue_event_childlRule!=''">
+              <th> Child Rule </th>
+              <td> {{venue_event_childlRule}} </td>
+            </tr>
+          
+          </table>
+        </div>
+        <div #mapsTab id="mapsTab"> </div>
+
+      </tab>
+
+      
+      <tab heading="UpcomingEvents" customClass="tab" (select)="onSearchVenue()">
+        <div *ngIf="UpcomingEventsExist">
+          <br>
+          <div class="row no_margin">
+            <div class="col-sm-2">
+                <select class="custom-select" name="venuesorttype" [(ngModel)]="venuesorttype" (change)="onVenueSort()">
+                  <option value="default"> Default </option>
+                  <option value="eventname"> Event Name </option>
+                  <option value="time"> Time </option>
+                  <option value="artist"> Artist </option>
+                  <option value="type"> Type </option>s
+                </select>
+            </div>
+
+            <div class="col-sm-3">
+                <select class="custom-select" name="venueorder" [(ngModel)]="venueorder" (change)="onVenueSort()" [disabled]="venuesorttype=='default'">
+                  <option value="ascending"  > Ascending Order </option>
+                  <option value="descending" > Descending Order </option>
+                </select>
+            </div>
+          </div>
+          <br>
+
+          <div [@fadeIn]="showmoreorlessFlag" *ngFor="let x of venueMetaInfo_part">
+          <table class="table venue_table ">
+              <tbody >
+                <tr>
+                  <td>
+                    <a target="_blank" href={{x.uri}}>
+                      {{x.displayName}}
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div>
+                      <span class="red_text" *ngIf="x.artist!=''">{{x.artist}}</span>
+                      &nbsp;&nbsp;
+                      <span class="gray_text" >{{x.date | date}} {{x.time}}</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Type: {{x.type}}
+                  </td>
+                </tr>
+                <br>
+              </tbody>
+            </table>
+            <br>
+          </div>
+        
+          <div class="btn btn-primary" (click)="showmoreorless()">
+              <div *ngIf="showmoreorlessFlag">
+                  Show More
+              </div>
+              <div *ngIf="!showmoreorlessFlag">
+                  Show Less
+              </div>
+          </div>
+          
+        </div>
+
+        <div *ngIf="!UpcomingEventsExist">
+            <br> <br> <br>
+            <div class="alert alert-warning result_panel">
+              No records.
+            </div>
+        </div>
+
+      </tab>
+    </tabset>
+
+
+</div>
+
+
+
+<div *ngIf="noRecords">
+    <br> <br> <br>
+    <div class="alert alert-warning result_panel">
+      No records.
+    </div>
+</div>
+
+<div *ngIf="failedSearch">
+    <br> <br> <br>
+    <div class="alert alert-danger result_panel">
+      Failed to get search results.
+    </div>
+</div>
+
+
+
+<div class="backdrop" [ngStyle]="{'display':seatmapDisplay}"></div>
+<div class="modal" tabindex="-1" role="dialog"  [ngStyle]="{'display':seatmapDisplay}">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">  
+          <span><b>View Seat Map</b></span>
+          <button type="button" class="close" aria-label="Close" (click)="closeModalDialog()"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="model-body">
+            <a target='_blank' href={{event_seatmap}}>
+                <img class="searmap-img" src={{event_seatmap}}>
+            </a>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" (click)="closeModalDialog()" >Close</button>
+        </div>
+      </div>
+    </div>
+  </div>

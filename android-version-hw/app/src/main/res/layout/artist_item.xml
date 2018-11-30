@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".ArtistFragment"
+    >
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/info_row_margin_bottom"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/artist_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:gravity="center"
+            />
+    </TableRow>
+
+
+    <TableRow
+        android:id="@+id/artist_artistteamsname_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/info_row_margin_bottom"
+        >
+
+        <TextView
+            android:layout_weight=".3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/artist_artistteamsname"
+            android:layout_weight=".7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No name" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/artist_followers_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/info_row_margin_bottom"
+        >
+
+        <TextView
+            android:layout_weight=".3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Followers"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/artist_followers"
+            android:layout_weight=".7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No followers" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/artist_popularity_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/info_row_margin_bottom"
+        >
+
+        <TextView
+            android:layout_weight=".3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Popularity"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/artist_popularity"
+            android:layout_weight=".7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No popularity" />
+    </TableRow>
+
+
+    <TableRow
+        android:id="@+id/artist_spotify_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        >
+
+        <TextView
+            android:layout_weight=".3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Check at"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/artist_spotify"
+            android:layout_weight=".7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No spotify"
+
+            >
+        </TextView>
+    </TableRow>
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/info_row_margin_bottom"
+        android:id="@+id/artist_photos_recyclerView_row"
+        android:gravity="center">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/artist_photos_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/info_row_margin_bottom"
+        android:gravity="center"
+        >
+        <TextView
+            android:id="@+id/artist_no_photos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No photos"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+    </TableRow>
+
+
+</TableLayout>
